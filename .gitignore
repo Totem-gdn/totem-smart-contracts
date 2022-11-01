@@ -1,0 +1,8 @@
+.DS_Store
+abi
+artifacts
+cache
+results
+node_modules
+.env*
+!.env.sample

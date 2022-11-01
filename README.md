@@ -1,1 +1,25 @@
 # totem-smart-contracts
+
+## Compile contracts
+
+```bash
+npm run compile
+```
+
+This command compiles all contracts from `contracts` directory. Compilation also creates two types of Contract ABI: `human-readable` and `json`, that can be found in `abi` directory.
+
+
+## Run local node
+
+```bash
+npm run local-node
+```
+
+## Deploy contracts
+
+Run script with `hardhat run` command. Provide `--network` from `hardhat.config.js`.
+
+```bash
+npx hardhat run scripts/deploy.js --network mumbai
+```
+
