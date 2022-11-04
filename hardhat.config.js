@@ -16,12 +16,12 @@ module.exports = {
   abiExporter: [{
     runOnCompile: true,
     clear: true,
-    pretty: true,
-    path: './abi/human-readable'
+    format: 'json',
+    path: './abi/json'
   }, {
     runOnCompile: true,
     clear: true,
-    pretty: false,
-    path: './abi/json'
+    format: 'fullName',
+    path: './abi/fullName'
   }]
 };

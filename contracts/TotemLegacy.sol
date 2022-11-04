@@ -23,93 +23,93 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
         _grantRole(PAUSER_ROLE, _msgSender());
     }
 
-    struct SystemRecordType {
+    struct GameLegacy {
         uint256 gameId;
         uint256 timestamp;
         string data;
     }
 
-    struct AchievementRecordType {
+    struct AssetLegacy {
         uint256 gameId;
         uint256 assetId;
         uint256 timestamp;
         string data;
     }
 
-    SystemRecordType[] private _systemRecords;
-    AchievementRecordType[] private _avatarAchievementRecords;
-    AchievementRecordType[] private _itemAchievementRecords;
-    AchievementRecordType[] private _gemAchievementRecords;
+    GameLegacy[] private _gameLegacies;
+    AssetLegacy[] private _avatarLegacies;
+    AssetLegacy[] private _itemLegacies;
+    AssetLegacy[] private _gemLegacies;
 
-    // Mapping from game index to system records counter
-    mapping(uint256 => Counters.Counter) private _gameSystemRecordsCounter;
+    // Mapping from game index to game legacy records counter
+    mapping(uint256 => Counters.Counter) private _gameRecordsCounter;
 
-    // Mapping from game index to mapping of the counter to system record index
-    mapping(uint256 => mapping(uint256 => uint256)) private _gameSystemRecords;
+    // Mapping from game index to mapping of the counter to game legacy record index
+    mapping(uint256 => mapping(uint256 => uint256)) private _gameRecords;
 
-    // Mapping from game index to avatar achievements counter
-    mapping(uint256 => Counters.Counter) private _gameAvatarAchievementsCounter;
+    // Mapping from game index to avatar legacy counter
+    mapping(uint256 => Counters.Counter) private _gameAvatarRecordsCounter;
 
-    // Mapping from game index to item achievements counter
-    mapping(uint256 => Counters.Counter) private _gameItemAchievementsCounter;
+    // Mapping from game index to item legacy counter
+    mapping(uint256 => Counters.Counter) private _gameItemRecordsCounter;
 
-    // Mapping from game index to gem achievements counter
-    mapping(uint256 => Counters.Counter) private _gameGemAchievementsCounter;
+    // Mapping from game index to gem legacy counter
+    mapping(uint256 => Counters.Counter) private _gameGemRecordsCounter;
 
-    // Mapping from game index to mapping of the counter to avatar achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _gameAvatarAchievements;
+    // Mapping from game index to mapping of the counter to avatar legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _gameAvatarRecords;
 
-    // Mapping from game index to mapping of the counter to item achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _gameItemAchievements;
+    // Mapping from game index to mapping of the counter to item legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _gameItemRecords;
 
-    // Mapping from game index to mapping of the counter to gem achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _gameGemAchievements;
+    // Mapping from game index to mapping of the counter to gem legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _gameGemRecords;
 
     // Mapping from avatar index to counter
-    mapping(uint256 => Counters.Counter) private _avatarAchievementsCounter;
+    mapping(uint256 => Counters.Counter) private _avatarRecordsCounter;
 
     // Mapping from item index to counter
-    mapping(uint256 => Counters.Counter) private _itemAchievementsCounter;
+    mapping(uint256 => Counters.Counter) private _itemRecordsCounter;
 
     // Mapping from gem index to counter
-    mapping(uint256 => Counters.Counter) private _gemAchievementsCounter;
+    mapping(uint256 => Counters.Counter) private _gemRecordsCounter;
 
-    // Mapping from avatar index to mapping of the counter to avatar achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _avatarAchievements;
+    // Mapping from avatar index to mapping of the counter to avatar legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _avatarRecords;
 
-    // Mapping from item index to mapping of the counter to avatar achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _itemAchievements;
+    // Mapping from item index to mapping of the counter to avatar legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _itemRecords;
 
-    // Mapping from gem index to mapping of the counter to avatar achievement index
-    mapping(uint256 => mapping(uint256 => uint256)) private _gemAchievements;
+    // Mapping from gem index to mapping of the counter to avatar legacy index
+    mapping(uint256 => mapping(uint256 => uint256)) private _gemRecords;
 
     /**
      * System records
      */
-    event SystemRecord(uint256 indexed gameId, uint256 recordId);
+    event GameLegacyRecord(uint256 indexed gameId, uint256 recordId);
 
-    function systemRecordsTotalSupply() public view returns (uint256) {
-        return _systemRecords.length;
+    function gameLegaciesTotalSupply() public view returns (uint256) {
+        return _gameLegacies.length;
     }
 
-    function systemRecordsOfGameTotalSupply(uint256 gameId) public view returns (uint256) {
-        return _gameSystemRecordsCounter[gameId].current();
+    function gameLegaciesOfGameTotalSupply(uint256 gameId) public view returns (uint256) {
+        return _gameRecordsCounter[gameId].current();
     }
 
-    function createSystemRecord(uint256 gameId, string calldata data) public whenNotPaused onlyRole(MANAGER_ROLE) {
-        _createSystemRecord(gameId, data);
+    function createGameLegacy(uint256 gameId, string calldata data) public whenNotPaused onlyRole(MANAGER_ROLE) {
+        _createGameLegacy(gameId, data);
     }
 
-    function _createSystemRecord(uint256 gameId, string calldata data) private {
-        uint256 recordId = _systemRecords.length;
-        _systemRecords.push(SystemRecordType(gameId, block.timestamp, data));
-        uint256 gameRecordId = _gameSystemRecordsCounter[gameId].current();
-        _gameSystemRecordsCounter[gameId].increment();
-        _gameSystemRecords[gameId][gameRecordId] = recordId;
-        emit SystemRecord(gameId, recordId);
+    function _createGameLegacy(uint256 gameId, string calldata data) private {
+        uint256 recordId = _gameLegacies.length;
+        _gameLegacies.push(GameLegacy(gameId, block.timestamp, data));
+        uint256 gameRecordId = _gameRecordsCounter[gameId].current();
+        _gameRecordsCounter[gameId].increment();
+        _gameRecords[gameId][gameRecordId] = recordId;
+        emit GameLegacyRecord(gameId, recordId);
     }
 
-    function systemRecordByIndex(uint256 recordId)
+    function gameLegacyByIndex(uint256 recordId)
         public
         view
         returns (
@@ -118,12 +118,12 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
             string memory data
         )
     {
-        require(recordId < _systemRecords.length, "invalid system records index, index out of bounds");
-        SystemRecordType storage record = _systemRecords[recordId];
+        require(recordId < _gameLegacies.length, "invalid record index, index out of bounds");
+        GameLegacy storage record = _gameLegacies[recordId];
         return (record.gameId, record.timestamp, record.data);
     }
 
-    function systemRecordOfGameByIndex(uint256 gameId_, uint256 index)
+    function gameLegacyOfGameByIndex(uint256 gameId_, uint256 index)
         public
         view
         returns (
@@ -132,15 +132,15 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
             string memory data
         )
     {
-        require(index < _gameSystemRecordsCounter[gameId].current(), "invalid game record index, index out of bounds");
-        SystemRecordType storage record = _systemRecords[_gameSystemRecords[gameId_][index]];
+        require(index < _gameRecordsCounter[gameId].current(), "invalid record index, index out of bounds");
+        GameLegacy storage record = _gameLegacies[_gameRecords[gameId_][index]];
         return (record.gameId, record.timestamp, record.data);
     }
 
     /**
      * Achievement records
      */
-    event AchievementRecord(
+    event AssetLegacyRecord(
         uint256 indexed assetId,
         bytes32 indexed assetType,
         uint256 indexed gameId,
@@ -152,90 +152,90 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
         _;
     }
 
-    function achievementsTotalSupply(bytes32 assetType)
+    function assetLegaciesTotalSupply(bytes32 assetType)
         public
         view
         validAssetType(assetType)
         returns (uint256 recordsCount)
     {
-        if (assetType == AVATAR_ASSET) return _avatarAchievementRecords.length;
-        if (assetType == ITEM_ASSET) return _itemAchievementRecords.length;
-        if (assetType == GEM_ASSET) return _gemAchievementRecords.length;
+        if (assetType == AVATAR_ASSET) return _avatarLegacies.length;
+        if (assetType == ITEM_ASSET) return _itemLegacies.length;
+        if (assetType == GEM_ASSET) return _gemLegacies.length;
     }
 
-    function achievementsOfGameTotalSupply(uint256 gameId, bytes32 assetType)
+    function assetLegaciesOfGameTotalSupply(uint256 gameId, bytes32 assetType)
         public
         view
         validAssetType(assetType)
         returns (uint256 recordsCount)
     {
-        if (assetType == AVATAR_ASSET) return _gameAvatarAchievementsCounter[gameId].current();
-        if (assetType == ITEM_ASSET) return _gameItemAchievementsCounter[gameId].current();
-        if (assetType == GEM_ASSET) return _gameGemAchievementsCounter[gameId].current();
+        if (assetType == AVATAR_ASSET) return _gameAvatarRecordsCounter[gameId].current();
+        if (assetType == ITEM_ASSET) return _gameItemRecordsCounter[gameId].current();
+        if (assetType == GEM_ASSET) return _gameGemRecordsCounter[gameId].current();
     }
 
-    function achievementsOfAssetTotalSupply(uint256 assetId, bytes32 assetType)
+    function assetLegaciesOfAssetTotalSupply(uint256 assetId, bytes32 assetType)
         public
         view
         validAssetType(assetType)
         returns (uint256 recordsCount)
     {
-        if (assetType == AVATAR_ASSET) return _avatarAchievementsCounter[assetId].current();
-        if (assetType == ITEM_ASSET) return _itemAchievementsCounter[assetId].current();
-        if (assetType == GEM_ASSET) return _gemAchievementsCounter[assetId].current();
+        if (assetType == AVATAR_ASSET) return _avatarRecordsCounter[assetId].current();
+        if (assetType == ITEM_ASSET) return _itemRecordsCounter[assetId].current();
+        if (assetType == GEM_ASSET) return _gemRecordsCounter[assetId].current();
     }
 
-    function createAchievementRecord(
+    function createAssetLegacy(
         uint256 gameId,
         uint256 assetId,
         bytes32 assetType,
         string calldata data
     ) public whenNotPaused onlyRole(MANAGER_ROLE) validAssetType(assetType) {
-        _createAchievementRecord(gameId, assetId, assetType, data);
+        _createAssetLegacy(gameId, assetId, assetType, data);
     }
 
-    function _createAchievementRecord(
+    function _createAssetLegacy(
         uint256 gameId,
         uint256 assetId,
         bytes32 assetType,
         string calldata data
     ) private {
-        AchievementRecordType memory record = AchievementRecordType(gameId, assetId, block.timestamp, data);
+        AssetLegacy memory record = AssetLegacy(gameId, assetId, block.timestamp, data);
         uint256 recordId = 0;
         if (assetType == AVATAR_ASSET) {
-            recordId = _avatarAchievementRecords.length;
-            _avatarAchievementRecords.push(record);
-            uint256 gameRecordId = _gameAvatarAchievementsCounter[gameId].current();
-            _gameAvatarAchievementsCounter[gameId].increment();
-            uint256 assetRecordId = _avatarAchievementsCounter[assetId].current();
-            _avatarAchievementsCounter[assetId].increment();
-            _gameAvatarAchievements[gameId][gameRecordId] = recordId;
-            _avatarAchievements[assetId][assetRecordId] = recordId;
+            recordId = _avatarLegacies.length;
+            _avatarLegacies.push(record);
+            uint256 gameRecordId = _gameAvatarRecordsCounter[gameId].current();
+            _gameAvatarRecordsCounter[gameId].increment();
+            uint256 assetRecordId = _avatarRecordsCounter[assetId].current();
+            _avatarRecordsCounter[assetId].increment();
+            _gameAvatarRecords[gameId][gameRecordId] = recordId;
+            _avatarRecords[assetId][assetRecordId] = recordId;
         }
         if (assetType == ITEM_ASSET) {
-            recordId = _itemAchievementRecords.length;
-            _itemAchievementRecords.push(record);
-            uint256 gameRecordId = _gameItemAchievementsCounter[gameId].current();
-            _gameItemAchievementsCounter[gameId].increment();
-            uint256 assetRecordId = _itemAchievementsCounter[assetId].current();
-            _itemAchievementsCounter[assetId].increment();
-            _gameItemAchievements[gameId][gameRecordId] = recordId;
-            _itemAchievements[assetId][assetRecordId] = recordId;
+            recordId = _itemLegacies.length;
+            _itemLegacies.push(record);
+            uint256 gameRecordId = _gameItemRecordsCounter[gameId].current();
+            _gameItemRecordsCounter[gameId].increment();
+            uint256 assetRecordId = _itemRecordsCounter[assetId].current();
+            _itemRecordsCounter[assetId].increment();
+            _gameItemRecords[gameId][gameRecordId] = recordId;
+            _itemRecords[assetId][assetRecordId] = recordId;
         }
         if (assetType == GEM_ASSET) {
-            recordId = _gemAchievementRecords.length;
-            _gemAchievementRecords.push(record);
-            uint256 gameRecordId = _gameGemAchievementsCounter[gameId].current();
-            _gameGemAchievementsCounter[gameId].increment();
-            uint256 assetRecordId = _gemAchievementsCounter[assetId].current();
-            _gemAchievementsCounter[assetId].increment();
-            _gameGemAchievements[gameId][gameRecordId] = recordId;
-            _gemAchievements[assetId][assetRecordId] = recordId;
+            recordId = _gemLegacies.length;
+            _gemLegacies.push(record);
+            uint256 gameRecordId = _gameGemRecordsCounter[gameId].current();
+            _gameGemRecordsCounter[gameId].increment();
+            uint256 assetRecordId = _gemRecordsCounter[assetId].current();
+            _gemRecordsCounter[assetId].increment();
+            _gameGemRecords[gameId][gameRecordId] = recordId;
+            _gemRecords[assetId][assetRecordId] = recordId;
         }
-        emit AchievementRecord(assetId, assetType, gameId, recordId);
+        emit AssetLegacyRecord(assetId, assetType, gameId, recordId);
     }
 
-    function achievementByIndex(uint256 index, bytes32 assetType)
+    function assetLegacyByIndex(uint256 index, bytes32 assetType)
         public
         view
         validAssetType(assetType)
@@ -247,23 +247,23 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
         )
     {
         if (assetType == AVATAR_ASSET) {
-            require(index < _avatarAchievementRecords.length, "invalid record index, index out of bounds");
-            AchievementRecordType storage record = _avatarAchievementRecords[index];
+            require(index < _avatarLegacies.length, "invalid record index, index out of bounds");
+            AssetLegacy storage record = _avatarLegacies[index];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == ITEM_ASSET) {
-            require(index < _itemAchievementRecords.length, "invalid record index, index out of bounds");
-            AchievementRecordType storage record = _itemAchievementRecords[index];
+            require(index < _itemLegacies.length, "invalid record index, index out of bounds");
+            AssetLegacy storage record = _itemLegacies[index];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == GEM_ASSET) {
-            require(index < _gemAchievementRecords.length, "invalid record index, index out of bounds");
-            AchievementRecordType storage record = _gemAchievementRecords[index];
+            require(index < _gemLegacies.length, "invalid record index, index out of bounds");
+            AssetLegacy storage record = _gemLegacies[index];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
     }
 
-    function achievementOfGameByIndex(
+    function assetLegacyOfGameByIndex(
         uint256 gameId_,
         uint256 index,
         bytes32 assetType
@@ -279,32 +279,23 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
         )
     {
         if (assetType == AVATAR_ASSET) {
-            require(
-                index < _gameAvatarAchievementsCounter[gameId_].current(),
-                "invalid record index, index out of bounds"
-            );
-            AchievementRecordType storage record = _avatarAchievementRecords[_gameAvatarAchievements[gameId][index]];
+            require(index < _gameAvatarRecordsCounter[gameId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _avatarLegacies[_gameAvatarRecords[gameId][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == ITEM_ASSET) {
-            require(
-                index < _gameItemAchievementsCounter[gameId_].current(),
-                "invalid record index, index out of bounds"
-            );
-            AchievementRecordType storage record = _itemAchievementRecords[_gameItemAchievements[gameId][index]];
+            require(index < _gameItemRecordsCounter[gameId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _itemLegacies[_gameItemRecords[gameId][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == GEM_ASSET) {
-            require(
-                index < _gameGemAchievementsCounter[gameId_].current(),
-                "invalid record index, index out of bounds"
-            );
-            AchievementRecordType storage record = _gemAchievementRecords[_gameGemAchievements[gameId][index]];
+            require(index < _gameGemRecordsCounter[gameId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _gemLegacies[_gameGemRecords[gameId][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
     }
 
-    function achievementOfAssetByIndex(
+    function assetLegacyOfAssetByIndex(
         uint256 assetId_,
         uint256 index,
         bytes32 assetType
@@ -320,21 +311,18 @@ contract TotemLegacy is Context, AccessControlEnumerable, TotemPauser {
         )
     {
         if (assetType == AVATAR_ASSET) {
-            require(
-                index < _avatarAchievementsCounter[assetId_].current(),
-                "invalid record index, index out of bounds"
-            );
-            AchievementRecordType storage record = _avatarAchievementRecords[_avatarAchievements[assetId_][index]];
+            require(index < _avatarRecordsCounter[assetId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _avatarLegacies[_avatarRecords[assetId_][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == ITEM_ASSET) {
-            require(index < _itemAchievementsCounter[assetId_].current(), "invalid record index, index out of bounds");
-            AchievementRecordType storage record = _itemAchievementRecords[_itemAchievements[assetId_][index]];
+            require(index < _itemRecordsCounter[assetId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _itemLegacies[_itemRecords[assetId_][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
         if (assetType == GEM_ASSET) {
-            require(index < _gemAchievementsCounter[assetId_].current(), "invalid record index, index out of bounds");
-            AchievementRecordType storage record = _gemAchievementRecords[_gemAchievements[assetId_][index]];
+            require(index < _gemRecordsCounter[assetId_].current(), "invalid record index, index out of bounds");
+            AssetLegacy storage record = _gemLegacies[_gemRecords[assetId_][index]];
             return (record.gameId, record.assetId, record.timestamp, record.data);
         }
     }
