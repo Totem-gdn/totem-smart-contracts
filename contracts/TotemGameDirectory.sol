@@ -145,7 +145,9 @@ contract TotemGameDirectory is Context, AccessControlEnumerable, TotemPauser {
         emit GameStatusChange(gameId, game.status);
     }
 
-    function gameByIndex(uint256 index)
+    function gameByIndex(
+        uint256 index
+    )
         public
         view
         returns (
@@ -162,7 +164,10 @@ contract TotemGameDirectory is Context, AccessControlEnumerable, TotemPauser {
         return (game.owner, game.name, game.author, game.renderer_uri, game.filters_uri, game.status);
     }
 
-    function gameOfOwnerByIndex(address owner, uint256 index)
+    function gameOfOwnerByIndex(
+        address owner,
+        uint256 index
+    )
         public
         view
         returns (

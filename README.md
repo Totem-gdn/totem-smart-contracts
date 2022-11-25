@@ -9,10 +9,10 @@ npm run compile
 This command compiles all contracts from `contracts` directory. Compilation also creates two types of Contract ABI: `human-readable` and `json`, that can be found in `abi` directory.
 
 
-## Run local node
+## Run tests
 
 ```bash
-npm run local-node
+npm test
 ```
 
 ## Deploy contracts
