@@ -2,6 +2,7 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-abi-exporter");
+require("hardhat-gas-reporter");
 module.exports = {
     solidity: "0.8.9",
     defaultNetwork: "hardhat",
@@ -26,4 +27,7 @@ module.exports = {
             path: "./abi/fullName",
         },
     ],
+    gasReporter: {
+        enable: true,
+    },
 };
