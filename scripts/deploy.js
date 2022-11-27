@@ -14,8 +14,10 @@ function contractUrl(address) {
 }
 
 async function deploy() {
-    const {CONTRACT_NAME} = process.env;
-    console.log(`creating contract factory: ${CONTRACT_NAME}`);
+    if (network.name === "mainnet") {
+        throw new Error(`mainnet unavailable right now`);
+    }
+    console.log(`creating contract factory: ${process.env.CONTRACT_NAME}`);
     const contractFactory = await ethers.getContractFactory(process.env.CONTRACT_NAME);
     const args = JSON.parse(process.env.CONTRACT_ARGS) || []; // json array
     console.log(`deploying contract...`);
@@ -27,9 +29,9 @@ async function deploy() {
         console.dir(contract);
         console.dir(txReceipt);
     }
-    const filepath = join(process.cwd(), "results", network.name);
+    const filepath = join(process.cwd(), "deployments", network.name, process.env.CONTRACT_NAME);
     await mkdir(filepath, {recursive: true});
-    const fd = await open(join(filepath, process.env.CONTRACT_NAME), "w+");
+    const fd = await open(join(filepath, contract.address), "w+");
     const ws = fd.createWriteStream({encoding: "utf-8"});
     ws.write(
         JSON.stringify(

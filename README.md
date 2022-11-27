@@ -23,3 +23,9 @@ Run script with `hardhat run` command. Provide `--network` from `hardhat.config.
 npx hardhat run scripts/deploy.js --network mumbai
 ```
 
+## Verify contract on etherscan
+
+```bash
+npx hardhat verify CONTRACT_ADDRESS --network mumbai
+```
+

@@ -6,180 +6,209 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "./abstract/TotemPauser.sol";
-import "./enums/EnumGameStatus.sol";
+import "./abstract/TotemMetadata.sol";
 
-contract TotemGameDirectory is Context, AccessControlEnumerable, TotemPauser {
+contract TotemGameDirectory is Context, AccessControlEnumerable, TotemPauser, TotemMetadata {
     using Counters for Counters.Counter;
 
-    // Roles
-    bytes32 public constant GAME_MANAGER_ROLE = keccak256("GAMES_MANAGER_ROLE");
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
 
-    constructor() {
-        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _grantRole(PAUSER_ROLE, _msgSender());
-        _grantRole(GAME_MANAGER_ROLE, _msgSender());
+    enum Status {
+        Pending,
+        Accepted,
+        Rejected,
+        Banned
     }
 
-    // Game data structure
     struct Game {
-        address owner;
         string name;
         string author;
-        string renderer_uri;
-        string filters_uri;
-        Status status;
+        string renderer;
+        string avatarFilter;
+        string assetFilter;
+        string gemFilter;
+        string website;
+        uint256 createdAt;
+        uint256 updatedAt;
     }
 
-    // Games storage
     Game[] private _games;
+    mapping(uint256 => address) private _gameOwner;
+    mapping(uint256 => Status) private _gameStatus;
+    mapping(address => uint256[]) private _ownerGames;
 
-    // Mapping owner to games counter
-    mapping(address => Counters.Counter) private _ownerGamesCounter;
+    constructor(string memory name, string memory symbol) TotemMetadata(name, symbol) {
+        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _grantRole(PAUSER_ROLE, _msgSender());
+        _grantRole(MANAGER_ROLE, _msgSender());
+    }
 
-    // Mapping owner to games
-    mapping(address => mapping(uint256 => uint256)) private _ownerGames;
+    modifier validGameId(uint256 gameId) {
+        require(gameId < _games.length, "invalid game index, index out of bounds");
+        _;
+    }
 
-    /**
-     * Events
-     */
-    event GameCreate(uint256 indexed gameId, address indexed owner, address indexed createdBy);
+    modifier validStatus(Status status) {
+        require(uint8(status) < 4, "invalid game status");
+        _;
+    }
 
-    event GameUpdate(uint256 indexed gameId, address indexed updatedBy);
-
-    event GameStatusChange(uint256 indexed gameId, Status indexed status);
-
-    /**
-     * Game
-     */
     function totalSupply() public view returns (uint256) {
         return _games.length;
     }
 
-    function ownerTotalSupply(address owner) public view returns (uint256) {
-        require(owner != address(0), "invalid owner address");
-        return _ownerGamesCounter[owner].current();
-    }
-
-    function createByManager(
-        address owner,
-        string calldata name,
-        string calldata author,
-        string calldata renderer_uri,
-        string calldata filters_uri,
-        Status status // by default it's 0, which is Status.Pending
-    ) public whenNotPaused onlyRole(GAME_MANAGER_ROLE) {
-        require(owner != address(0), "invalid owner address");
-        require(uint8(status) < 4, "invalid status");
-        _create(owner, name, author, renderer_uri, filters_uri, status);
-    }
-
-    function create(
-        string calldata name,
-        string calldata author,
-        string calldata renderer_uri,
-        string calldata filters_uri
-    ) public whenNotPaused {
-        _create(_msgSender(), name, author, renderer_uri, filters_uri, Status.Pending);
-    }
-
-    function _create(
-        address owner,
-        string calldata name,
-        string calldata author,
-        string calldata renderer_uri,
-        string calldata filters_uri,
-        Status status
-    ) private {
-        uint256 newGameId = _games.length;
-        uint256 ownerIndex = _ownerGamesCounter[owner].current();
-        _ownerGamesCounter[owner].increment();
-        _games.push(Game(owner, name, author, renderer_uri, filters_uri, status));
-        _ownerGames[owner][ownerIndex] = newGameId;
-        emit GameCreate(newGameId, owner, _msgSender());
-    }
-
-    function update(
-        uint256 index,
-        string calldata name,
-        string calldata author,
-        string calldata renderer_uri,
-        string calldata filters_uri
-    ) public whenNotPaused {
-        require(
-            _msgSender() == _games[index].owner || hasRole(GAME_MANAGER_ROLE, _msgSender()),
-            "forbidden, only owner or manager can update game information"
-        );
-        require(index < _games.length, "invalid game index, index out of bounds");
-        _update(index, name, author, renderer_uri, filters_uri);
-    }
-
-    function _update(
-        uint256 gameId,
-        string calldata name,
-        string calldata author,
-        string calldata renderer_uri,
-        string calldata filters_uri
-    ) private {
-        Game storage game = _games[gameId];
-        game.name = name;
-        game.author = author;
-        game.renderer_uri = renderer_uri;
-        game.filters_uri = filters_uri;
-        // Change game status to "Pending" if updated by owner for additional review
-        if (_msgSender() == game.owner) {
-            game.status = Status.Pending;
-            emit GameStatusChange(gameId, game.status);
-        }
-        emit GameUpdate(gameId, _msgSender());
-    }
-
-    function changeStatus(uint256 index, Status status) public whenNotPaused onlyRole(GAME_MANAGER_ROLE) {
-        require(index < _games.length, "invalid game index, index out of bounds");
-        require(uint8(status) < 4, "invalid status");
-        _changeStatus(index, status);
-    }
-
-    function _changeStatus(uint256 gameId, Status status) private {
-        Game storage game = _games[gameId];
-        game.status = status;
-        emit GameStatusChange(gameId, game.status);
+    function balanceOf(address owner) public view returns (uint256) {
+        return _ownerGames[owner].length;
     }
 
     function gameByIndex(
-        uint256 index
-    )
-        public
-        view
-        returns (
-            address owner,
-            string memory name,
-            string memory author,
-            string memory renderer_uri,
-            string memory filters_uri,
-            Status status
-        )
-    {
-        require(index < _games.length, "invalid game index, index out of bounds");
-        Game storage game = _games[index];
-        return (game.owner, game.name, game.author, game.renderer_uri, game.filters_uri, game.status);
+        uint256 gameId
+    ) public view validGameId(gameId) returns (address owner, Game memory game, Status status) {
+        return (_gameOwner[gameId], _games[gameId], _gameStatus[gameId]);
     }
 
-    function gameOfOwnerByIndex(
-        address owner,
+    function ownerGameByIndex(
+        address gameOwner,
         uint256 index
-    )
-        public
-        view
-        returns (
-            string memory name,
-            string memory author,
-            string memory renderer_uri,
-            string memory filters_uri,
-            Status status
-        )
-    {
-        require(index < _ownerGamesCounter[owner].current(), "invalid owner game index, index out of bounds");
-        Game storage game = _games[_ownerGames[owner][index]];
-        return (game.name, game.author, game.renderer_uri, game.filters_uri, game.status);
+    ) public view returns (address owner, Game memory game, Status status) {
+        require(index < _ownerGames[gameOwner].length, "invalid owner game index, index out of bounds");
+        uint256 gameId = _ownerGames[gameOwner][index];
+        return (_gameOwner[gameId], _games[gameId], _gameStatus[gameId]);
+    }
+
+    event CreateGame(address indexed owner, uint256 indexed gameId);
+
+    struct CreateGameData {
+        string name;
+        string author;
+        string renderer;
+        string avatarFilter;
+        string assetFilter;
+        string gemFilter;
+        string website;
+    }
+
+    function create(
+        address owner,
+        CreateGameData calldata game,
+        Status status
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validStatus(status) {
+        require(owner != address(0), "invalid owner address");
+        require(bytes(game.name).length > 0, "invalid name length");
+        require(bytes(game.author).length > 0, "invalid author length");
+        uint256 gameId = _games.length;
+        _games.push(
+            Game(
+                game.name,
+                game.author,
+                game.renderer,
+                game.avatarFilter,
+                game.assetFilter,
+                game.gemFilter,
+                game.website,
+                block.timestamp,
+                block.timestamp
+            )
+        );
+        _gameOwner[gameId] = owner;
+        _gameStatus[gameId] = status;
+        _ownerGames[owner].push(gameId);
+        emit CreateGame(owner, gameId);
+    }
+
+    event UpdateGame(uint256 indexed gameId, string updatedField);
+
+    function changeOwner(
+        uint256 gameId,
+        address newOwner
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        require(newOwner != address(0), "invalid new owner address");
+        address prevOwner = _gameOwner[gameId];
+        require(newOwner != prevOwner, "owner not changed");
+        for (uint256 i = 0; i < _ownerGames[prevOwner].length; i++) {
+            if (_ownerGames[prevOwner][i] == gameId) {
+                _ownerGames[prevOwner][i] = _ownerGames[prevOwner][_ownerGames[prevOwner].length - 1];
+                _ownerGames[prevOwner].pop();
+                break;
+            }
+        }
+        _ownerGames[newOwner].push(gameId);
+        _gameOwner[gameId] = newOwner;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "owner");
+    }
+
+    function changeName(
+        uint256 gameId,
+        string calldata name
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        require(bytes(name).length > 0, "invalid name length");
+        _games[gameId].name = name;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "name");
+    }
+
+    function changeAuthor(
+        uint256 gameId,
+        string calldata author
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        require(bytes(author).length > 0, "invalid author length");
+        _games[gameId].author = author;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "author");
+    }
+
+    function changeRenderer(
+        uint256 gameId,
+        string calldata renderer
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        _games[gameId].renderer = renderer;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "renderer");
+    }
+
+    function changeAvatarFilter(
+        uint256 gameId,
+        string calldata avatarFilter
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        _games[gameId].avatarFilter = avatarFilter;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "avatarFilter");
+    }
+
+    function changeAssetFilter(
+        uint256 gameId,
+        string calldata assetFilter
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        _games[gameId].assetFilter = assetFilter;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "assetFilter");
+    }
+
+    function changeGemFilter(
+        uint256 gameId,
+        string calldata gemFilter
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        _games[gameId].gemFilter = gemFilter;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "gemFilter");
+    }
+
+    function changeWebsite(
+        uint256 gameId,
+        string calldata website
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) {
+        _games[gameId].website = website;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "website");
+    }
+
+    function changeStatus(
+        uint256 gameId,
+        Status status
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) validGameId(gameId) validStatus(status) {
+        _gameStatus[gameId] = status;
+        _games[gameId].updatedAt = block.timestamp;
+        emit UpdateGame(gameId, "status");
     }
 }

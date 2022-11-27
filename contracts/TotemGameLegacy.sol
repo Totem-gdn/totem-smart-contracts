@@ -36,20 +36,15 @@ contract TotemGameLegacy is Context, AccessControlEnumerable, TotemPauser, Totem
         return _gameCounter[gameId].current();
     }
 
-    function recordByIndex(
-        uint256 index
-    ) public view returns (uint256 _gameId, uint256 _timestamp, string memory _data) {
+    function recordByIndex(uint256 index) public view returns (LegacyRecord memory record) {
         require(index < _records.length, "invalid record index, index out of bounds");
-        return (_records[index].gameId, _records[index].timestamp, _records[index].data);
+        return (_records[index]);
     }
 
-    function gameRecordByIndex(
-        uint256 gameId,
-        uint256 index
-    ) public view returns (uint256 _gameId, uint256 _timestamp, string memory _data) {
+    function gameRecordByIndex(uint256 gameId, uint256 index) public view returns (LegacyRecord memory record) {
         require(index < _gameCounter[gameId].current(), "invalid game record index, index out of bounds");
         uint256 id = _gameRecords[gameId][index];
-        return (_records[id].gameId, _records[id].timestamp, _records[id].data);
+        return (_records[id]);
     }
 
     event GameLegacyRecord(uint256 indexed gameId, uint256 indexed recordId);
