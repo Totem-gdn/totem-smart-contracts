@@ -62,18 +62,18 @@ contract TotemGameDirectory is Context, AccessControlEnumerable, TotemPauser, To
     }
 
     function gameByIndex(
-        uint256 gameId
-    ) public view validGameId(gameId) returns (address owner, Game memory game, Status status) {
-        return (_gameOwner[gameId], _games[gameId], _gameStatus[gameId]);
+        uint256 index
+    ) public view validGameId(index) returns (uint256 gameId, address owner, Game memory game, Status status) {
+        return (index, _gameOwner[index], _games[index], _gameStatus[index]);
     }
 
     function ownerGameByIndex(
         address gameOwner,
         uint256 index
-    ) public view returns (address owner, Game memory game, Status status) {
+    ) public view returns (uint256 gameId, address owner, Game memory game, Status status) {
         require(index < _ownerGames[gameOwner].length, "invalid owner game index, index out of bounds");
-        uint256 gameId = _ownerGames[gameOwner][index];
-        return (_gameOwner[gameId], _games[gameId], _gameStatus[gameId]);
+        uint256 id = _ownerGames[gameOwner][index];
+        return (id, _gameOwner[id], _games[id], _gameStatus[id]);
     }
 
     event CreateGame(address indexed owner, uint256 indexed gameId);
