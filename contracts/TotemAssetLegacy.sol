@@ -51,14 +51,20 @@ contract TotemAssetLegacy is Context, AccessControlEnumerable, TotemPauser, Tote
         return (id, _records[id]);
     }
 
-    event AssetLegacyRecord(uint256 indexed assetId, uint256 indexed gameId, uint256 indexed recordId);
+    event AssetLegacyRecord(address indexed player, uint256 indexed assetId, uint256 indexed gameId, uint256 recordId);
 
-    function create(uint256 assetId, uint256 gameId, string calldata data) public whenNotPaused onlyRole(MANAGER_ROLE) {
+    function create(
+        address player,
+        uint256 assetId,
+        uint256 gameId,
+        string calldata data
+    ) public whenNotPaused onlyRole(MANAGER_ROLE) {
+        require(player != address(0), "invalid player address");
         uint256 recordId = _records.length;
         uint256 assetRecordId = _assetCounter[assetId].current();
         _assetCounter[assetId].increment();
         _records.push(LegacyRecord(assetId, gameId, block.timestamp, data));
         _assetRecords[assetId][assetRecordId] = recordId;
-        emit AssetLegacyRecord(assetId, gameId, recordId);
+        emit AssetLegacyRecord(player, assetId, gameId, recordId);
     }
 }

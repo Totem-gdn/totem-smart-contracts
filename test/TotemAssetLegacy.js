@@ -5,10 +5,12 @@ const {BigNumber} = require("ethers");
 
 describe("Totem asset legacy contract", function () {
     let totemAssetLegacies;
+    let playerAddress;
 
     before(async function () {
         const contractFactory = await ethers.getContractFactory("TotemAssetLegacy");
         totemAssetLegacies = await contractFactory.deploy("Totem Asset Legacies", "TotemAssetLegacies");
+        playerAddress = ethers.Wallet.createRandom().address;
     });
 
     it("Should deploy successfully", async function () {
@@ -27,9 +29,9 @@ describe("Totem asset legacy contract", function () {
         expect(await totemAssetLegacies.balanceOf(emptyAssetId)).to.equal(BigNumber.from("0"));
 
         const newRecordId = BigNumber.from("0");
-        await expect(await totemAssetLegacies.create(assetId, gameId, assetData))
+        await expect(await totemAssetLegacies.create(playerAddress, assetId, gameId, assetData))
             .to.emit(totemAssetLegacies, "AssetLegacyRecord")
-            .withArgs(assetId, gameId, newRecordId);
+            .withArgs(playerAddress, assetId, gameId, newRecordId);
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("1"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("1"));
@@ -45,9 +47,9 @@ describe("Totem asset legacy contract", function () {
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("1"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("1"));
 
-        await expect(await totemAssetLegacies.create(assetId, gameId, assetData))
+        await expect(await totemAssetLegacies.create(playerAddress, assetId, gameId, assetData))
             .to.emit(totemAssetLegacies, "AssetLegacyRecord")
-            .withArgs(assetId, gameId, recordId);
+            .withArgs(playerAddress, assetId, gameId, recordId);
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("2"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("2"));
