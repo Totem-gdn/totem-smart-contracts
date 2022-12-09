@@ -51,10 +51,9 @@ describe("Totem game legacy contract", function () {
         expect(await totemGameLegacies.balanceOf(gameId)).to.equal(BigNumber.from("2"));
 
         const assetRecord = await totemGameLegacies.recordByIndex(recordId);
-        expect(assetRecord.recordId).to.equal(recordId);
-        expect(assetRecord.record.gameId).to.equal(gameId);
-        expect(assetRecord.record.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
-        expect(assetRecord.record.data).to.equal(gameData);
+        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
+        expect(assetRecord.data).to.equal(gameData);
     });
 
     it("Should return game record by index", async function () {
@@ -65,11 +64,12 @@ describe("Totem game legacy contract", function () {
         expect(await totemGameLegacies.totalSupply()).to.equal(BigNumber.from("2"));
         expect(await totemGameLegacies.balanceOf(gameId)).to.equal(BigNumber.from("2"));
 
-        const assetRecord = await totemGameLegacies.gameRecordByIndex(gameId, recordId);
-        expect(assetRecord.recordId).to.equal(recordId);
-        expect(assetRecord.record.gameId).to.equal(gameId);
-        expect(assetRecord.record.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
-        expect(assetRecord.record.data).to.equal(gameData);
+        const assetRecordId = await totemGameLegacies.gameRecordByIndex(gameId, recordId);
+        expect(assetRecordId).to.equal(recordId);
+        const assetRecord = await totemGameLegacies.recordByIndex(assetRecordId);
+        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
+        expect(assetRecord.data).to.equal(gameData);
     });
 
     it("Should return error index out of bounds", async function () {

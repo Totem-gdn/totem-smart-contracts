@@ -37,18 +37,14 @@ contract TotemAssetLegacy is Context, AccessControlEnumerable, TotemPauser, Tote
         return _assetCounter[assetId].current();
     }
 
-    function recordByIndex(uint256 index) public view returns (uint256 recordId, LegacyRecord memory record) {
+    function recordByIndex(uint256 index) public view returns (LegacyRecord memory record) {
         require(index < _records.length, "invalid record index, index out of bounds");
-        return (index, _records[index]);
+        return _records[index];
     }
 
-    function assetRecordByIndex(
-        uint256 assetId,
-        uint256 index
-    ) public view returns (uint256 recordId, LegacyRecord memory record) {
+    function assetRecordByIndex(uint256 assetId, uint256 index) public view returns (uint256 recordId) {
         require(index < _assetCounter[assetId].current(), "invalid asset record index, index out of bounds");
-        uint256 id = _assetRecords[assetId][index];
-        return (id, _records[id]);
+        return _assetRecords[assetId][index];
     }
 
     event AssetLegacyRecord(address indexed player, uint256 indexed assetId, uint256 indexed gameId, uint256 recordId);

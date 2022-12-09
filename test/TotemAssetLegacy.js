@@ -55,11 +55,10 @@ describe("Totem asset legacy contract", function () {
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("2"));
 
         const assetRecord = await totemAssetLegacies.recordByIndex(recordId);
-        expect(assetRecord.recordId).to.equal(recordId);
-        expect(assetRecord.record.assetId).to.equal(assetId);
-        expect(assetRecord.record.gameId).to.equal(gameId);
-        expect(assetRecord.record.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
-        expect(assetRecord.record.data).to.equal(assetData);
+        expect(assetRecord.assetId).to.equal(assetId);
+        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
+        expect(assetRecord.data).to.equal(assetData);
     });
 
     it("Should return asset record by index", async function () {
@@ -72,12 +71,13 @@ describe("Totem asset legacy contract", function () {
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("2"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("2"));
 
-        const assetRecord = await totemAssetLegacies.assetRecordByIndex(assetId, index);
-        expect(assetRecord.recordId).to.equal(recordId);
-        expect(assetRecord.record.assetId).to.equal(assetId);
-        expect(assetRecord.record.gameId).to.equal(gameId);
-        expect(assetRecord.record.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
-        expect(assetRecord.record.data).to.equal(assetData);
+        const assetRecordId = await totemAssetLegacies.assetRecordByIndex(assetId, index);
+        expect(assetRecordId).to.equal(recordId);
+        const assetRecord = await totemAssetLegacies.recordByIndex(assetRecordId);
+        expect(assetRecord.assetId).to.equal(assetId);
+        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
+        expect(assetRecord.data).to.equal(assetData);
     });
 
     it("Should return error index out of bounds", async function () {
