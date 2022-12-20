@@ -25,7 +25,7 @@ contract TotemGamesDirectory is Context, AccessControlEnumerable, TotemPauser, T
         string author;
         string renderer;
         string avatarFilter;
-        string assetFilter;
+        string itemFilter;
         string gemFilter;
         string website;
         uint256 createdAt;
@@ -79,7 +79,7 @@ contract TotemGamesDirectory is Context, AccessControlEnumerable, TotemPauser, T
         string author;
         string renderer;
         string avatarFilter;
-        string assetFilter;
+        string itemFilter;
         string gemFilter;
         string website;
     }
@@ -99,7 +99,7 @@ contract TotemGamesDirectory is Context, AccessControlEnumerable, TotemPauser, T
                 game.author,
                 game.renderer,
                 game.avatarFilter,
-                game.assetFilter,
+                game.itemFilter,
                 game.gemFilter,
                 game.website,
                 block.timestamp,
@@ -172,13 +172,13 @@ contract TotemGamesDirectory is Context, AccessControlEnumerable, TotemPauser, T
         emit UpdateGame(recordId, "avatarFilter");
     }
 
-    function changeAssetFilter(
+    function changeItemFilter(
         uint256 recordId,
-        string calldata assetFilter
+        string calldata itemFilter
     ) public whenNotPaused onlyRole(MANAGER_ROLE) validRecordId(recordId) {
-        _games[recordId].assetFilter = assetFilter;
+        _games[recordId].itemFilter = itemFilter;
         _games[recordId].updatedAt = block.timestamp;
-        emit UpdateGame(recordId, "assetFilter");
+        emit UpdateGame(recordId, "itemFilter");
     }
 
     function changeGemFilter(

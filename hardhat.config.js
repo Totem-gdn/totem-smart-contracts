@@ -7,6 +7,11 @@ require("hardhat-gas-reporter");
 module.exports = {
     solidity: "0.8.9",
     defaultNetwork: "hardhat",
+    etherscan: {
+        apiKey: {
+            polygonMumbai: process.env.ETHERSCAN_APIKEY,
+        },
+    },
     networks: {
         hardhat: {},
         mumbai: {

@@ -22,9 +22,17 @@ async function deploy() {
     const args = JSON.parse(process.env.CONTRACT_ARGS) || []; // json array
     console.log(`deploying contract...`);
     const contract = await contractFactory.deploy(...args);
-    await contract.deployed();
-    const txReceipt = await hre.ethers.provider.getTransaction(contract.deployTransaction.hash);
-    console.log(`deployed at ${contractUrl(contract.address)}`);
+    let txReceipt;
+    while (true) {
+        try {
+            await contract.deployed();
+            txReceipt = await hre.ethers.provider.getTransaction(contract.deployTransaction.hash);
+            console.log(`deployed at ${contractUrl(contract.address)}`);
+            break;
+        } catch (ex) {
+            console.error(ex.message);
+        }
+    }
     if (process.env.DEBUG_LOGS) {
         console.dir(contract);
         console.dir(txReceipt);
@@ -56,6 +64,6 @@ async function deploy() {
 }
 
 deploy().catch((err) => {
-    console.error(err);
+    console.error(err.message, err.stack);
     process.exit(1);
 });
