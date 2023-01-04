@@ -6,11 +6,13 @@ const {BigNumber} = require("ethers");
 describe("Totem asset legacy contract", function () {
     let totemAssetLegacies;
     let playerAddress;
+    let gameAddress;
 
     before(async function () {
         const contractFactory = await ethers.getContractFactory("TotemAssetLegacy");
         totemAssetLegacies = await contractFactory.deploy("Totem Asset Legacies", "TotemAssetLegacies");
         playerAddress = ethers.Wallet.createRandom().address;
+        gameAddress = ethers.Wallet.createRandom().address;
     });
 
     it("Should deploy successfully", async function () {
@@ -20,7 +22,6 @@ describe("Totem asset legacy contract", function () {
 
     it("Should add new legacy record to asset", async function () {
         const assetId = BigNumber.from("0");
-        const gameId = BigNumber.from("0");
         const assetData = JSON.stringify({index: "0"});
         const emptyAssetId = BigNumber.from("9999");
 
@@ -29,9 +30,9 @@ describe("Totem asset legacy contract", function () {
         expect(await totemAssetLegacies.balanceOf(emptyAssetId)).to.equal(BigNumber.from("0"));
 
         const newRecordId = BigNumber.from("0");
-        await expect(await totemAssetLegacies.create(playerAddress, assetId, gameId, assetData))
+        await expect(await totemAssetLegacies.create(playerAddress, gameAddress, assetId, assetData))
             .to.emit(totemAssetLegacies, "AssetLegacyRecord")
-            .withArgs(playerAddress, assetId, gameId, newRecordId);
+            .withArgs(playerAddress, gameAddress, assetId, newRecordId);
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("1"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("1"));
@@ -41,41 +42,36 @@ describe("Totem asset legacy contract", function () {
     it("Should receive record by index", async function () {
         const recordId = BigNumber.from("1");
         const assetId = BigNumber.from("0");
-        const gameId = BigNumber.from("0");
         const assetData = JSON.stringify({index: "1"});
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("1"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("1"));
 
-        await expect(await totemAssetLegacies.create(playerAddress, assetId, gameId, assetData))
+        await expect(await totemAssetLegacies.create(playerAddress, gameAddress, assetId, assetData))
             .to.emit(totemAssetLegacies, "AssetLegacyRecord")
-            .withArgs(playerAddress, assetId, gameId, recordId);
+            .withArgs(playerAddress, gameAddress, assetId, recordId);
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("2"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("2"));
 
         const assetRecord = await totemAssetLegacies.recordByIndex(recordId);
         expect(assetRecord.assetId).to.equal(assetId);
-        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.gameAddress).to.equal(gameAddress);
         expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
         expect(assetRecord.data).to.equal(assetData);
     });
 
     it("Should return asset record by index", async function () {
-        const recordId = BigNumber.from("1");
         const assetId = BigNumber.from("0");
         const index = BigNumber.from("1");
-        const gameId = BigNumber.from("0");
         const assetData = JSON.stringify({index: "1"});
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(BigNumber.from("2"));
         expect(await totemAssetLegacies.balanceOf(assetId)).to.equal(BigNumber.from("2"));
 
-        const assetRecordId = await totemAssetLegacies.assetRecordByIndex(assetId, index);
-        expect(assetRecordId).to.equal(recordId);
-        const assetRecord = await totemAssetLegacies.recordByIndex(assetRecordId);
+        const assetRecord = await totemAssetLegacies.assetRecordByIndex(assetId, index);
         expect(assetRecord.assetId).to.equal(assetId);
-        expect(assetRecord.gameId).to.equal(gameId);
+        expect(assetRecord.gameAddress).to.equal(gameAddress);
         expect(assetRecord.timestamp.toNumber()).to.lessThanOrEqual(Date.now());
         expect(assetRecord.data).to.equal(assetData);
     });
@@ -86,7 +82,7 @@ describe("Totem asset legacy contract", function () {
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(totalSupply);
         await expect(totemAssetLegacies.recordByIndex(invalidRecordId)).to.be.revertedWith(
-            "invalid record index, index out of bounds"
+            "invalid record: index out of bounds"
         );
     });
 
@@ -97,7 +93,7 @@ describe("Totem asset legacy contract", function () {
 
         expect(await totemAssetLegacies.totalSupply()).to.equal(totalSupply);
         await expect(totemAssetLegacies.assetRecordByIndex(assetId, invalidRecordId)).to.be.revertedWith(
-            "invalid asset record index, index out of bounds"
+            "invalid asset record: index out of bounds"
         );
     });
 });

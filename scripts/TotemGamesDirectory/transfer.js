@@ -8,9 +8,14 @@ async function transfer() {
     const games = await fetch(process.env.EXPLORER_API).then((res) => res.json());
     for (const game of games.reverse()) {
         console.group(game.general.name);
+        const wallet = hre.ethers.Wallet.createRandom();
+        console.log(`mnemonic: ${wallet.mnemonic.phrase}`);
+        console.log(`privateKey: ${wallet.privateKey}`);
         while (true) {
             try {
                 const gameRecord = {
+                    addr: wallet.address,
+                    owner: game.owner,
                     name: game.general.name || "",
                     author: game.general.author || "",
                     renderer: game.connections.assetRenderer || "",
@@ -18,10 +23,11 @@ async function transfer() {
                     itemFilter: (game.connections.dnaFilters && game.connections.dnaFilters.itemFilter) || "",
                     gemFilter: (game.connections.dnaFilters && game.connections.dnaFilters.gemFilter) || "",
                     website: game.connections.webpage || "",
+                    status: 1,
                 };
                 const {maxFeePerGas, maxPriorityFeePerGas} = await provider.getFeeData();
-                const gasLimit = await contract.estimateGas.create(game.owner, gameRecord, 1);
-                const tx = await contract.create(game.owner, gameRecord, 1, {
+                const gasLimit = await contract.estimateGas.create(gameRecord);
+                const tx = await contract.create(gameRecord, {
                     gasLimit,
                     maxFeePerGas,
                     maxPriorityFeePerGas,

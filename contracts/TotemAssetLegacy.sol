@@ -14,14 +14,18 @@ contract TotemAssetLegacy is Context, AccessControlEnumerable, TotemPauser, Tote
 
     struct LegacyRecord {
         uint256 assetId;
-        uint256 gameId;
+        address gameAddress;
         uint256 timestamp;
         string data;
     }
 
+    struct AssetRecordsStorage {
+        mapping(uint256 => Counters.Counter) counter;
+        mapping(uint256 => mapping(uint256 => uint256)) indexes;
+    }
+
     LegacyRecord[] private _records;
-    mapping(uint256 => Counters.Counter) private _assetCounter;
-    mapping(uint256 => mapping(uint256 => uint256)) private _assetRecords;
+    AssetRecordsStorage private _assetRecords;
 
     constructor(string memory name, string memory symbol) TotemMetadata(name, symbol) {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -34,33 +38,40 @@ contract TotemAssetLegacy is Context, AccessControlEnumerable, TotemPauser, Tote
     }
 
     function balanceOf(uint256 assetId) public view returns (uint256) {
-        return _assetCounter[assetId].current();
+        return _assetRecords.counter[assetId].current();
     }
 
     function recordByIndex(uint256 index) public view returns (LegacyRecord memory record) {
-        require(index < _records.length, "invalid record index, index out of bounds");
+        require(index < _records.length, "invalid record: index out of bounds");
         return _records[index];
     }
 
-    function assetRecordByIndex(uint256 assetId, uint256 index) public view returns (uint256 recordId) {
-        require(index < _assetCounter[assetId].current(), "invalid asset record index, index out of bounds");
-        return _assetRecords[assetId][index];
+    function assetRecordByIndex(uint256 assetId, uint256 index) public view returns (LegacyRecord memory record) {
+        require(index < _assetRecords.counter[assetId].current(), "invalid asset record: index out of bounds");
+        uint256 id = _assetRecords.indexes[assetId][index];
+        return _records[id];
     }
 
-    event AssetLegacyRecord(address indexed player, uint256 indexed assetId, uint256 indexed gameId, uint256 recordId);
+    event AssetLegacyRecord(
+        address indexed playerAddress,
+        address indexed gameAddress,
+        uint256 indexed assetId,
+        uint256 recordId
+    );
 
     function create(
-        address player,
+        address playerAddress,
+        address gameAddress,
         uint256 assetId,
-        uint256 gameId,
         string calldata data
     ) public whenNotPaused onlyRole(MANAGER_ROLE) {
-        require(player != address(0), "invalid player address");
+        require(playerAddress != address(0), "invalid player address: must not be 0");
+        require(gameAddress != address(0), "invalid game address: must not be 0");
         uint256 recordId = _records.length;
-        uint256 assetRecordId = _assetCounter[assetId].current();
-        _assetCounter[assetId].increment();
-        _records.push(LegacyRecord(assetId, gameId, block.timestamp, data));
-        _assetRecords[assetId][assetRecordId] = recordId;
-        emit AssetLegacyRecord(player, assetId, gameId, recordId);
+        uint256 assetRecordId = _assetRecords.counter[assetId].current();
+        _assetRecords.counter[assetId].increment();
+        _records.push(LegacyRecord(assetId, gameAddress, block.timestamp, data));
+        _assetRecords.indexes[assetId][assetRecordId] = recordId;
+        emit AssetLegacyRecord(playerAddress, gameAddress, assetId, recordId);
     }
 }
