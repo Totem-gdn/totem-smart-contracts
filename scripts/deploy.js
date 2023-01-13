@@ -17,13 +17,13 @@ async function deploy() {
     if (hre.network.name === "mainnet") {
         throw new Error(`mainnet unavailable right now`);
     }
-    console.log(`creating contract factory: ${process.env.CONTRACT_NAME}(${process.env.CONTRACT_ARGS})`);
+    console.log(`creating contract factory: ${process.env.CONTRACT_FACTORY}(${process.env.CONTRACT_ARGS})`);
     const args = JSON.parse(process.env.CONTRACT_ARGS) || []; // json array
     console.log(`deploying contract...`);
     let contract, txReceipt;
     while (true) {
         try {
-            const contractFactory = await hre.ethers.getContractFactory(process.env.CONTRACT_NAME);
+            const contractFactory = await hre.ethers.getContractFactory(process.env.CONTRACT_FACTORY);
             contract = await contractFactory.deploy(...args);
             await contract.deployed();
             txReceipt = await hre.ethers.provider.getTransaction(contract.deployTransaction.hash);
@@ -42,7 +42,7 @@ async function deploy() {
         "deployments",
         new Date().toDateString().replace(/\s/g, "-"),
         hre.network.name,
-        process.env.CONTRACT_NAME
+        process.env.CONTRACT_FACTORY
     );
     await mkdir(filepath, {recursive: true});
     const fd = await open(join(filepath, `${args[1]}_${contract.address}`), "w+");

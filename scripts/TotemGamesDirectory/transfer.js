@@ -4,9 +4,9 @@ const hre = require("hardhat");
 async function transfer() {
     const provider = await hre.ethers.provider;
     const signer = await hre.ethers.getSigner(process.env.PUBLIC_KEY);
-    const contract = await hre.ethers.getContractAt(process.env.CONTRACT_NAME, process.env.CONTRACT_ADDRESS, signer);
+    const contract = await hre.ethers.getContractAt(process.env.CONTRACT_FACTORY, process.env.CONTRACT_ADDRESS, signer);
     const games = await fetch(process.env.EXPLORER_API).then((res) => res.json());
-    for (const game of games.reverse()) {
+    for (const game of games) {
         console.group(game.general.name);
         const wallet = hre.ethers.Wallet.createRandom();
         console.log(`mnemonic: ${wallet.mnemonic.phrase}`);
@@ -14,8 +14,7 @@ async function transfer() {
         while (true) {
             try {
                 const gameRecord = {
-                    addr: wallet.address,
-                    owner: game.owner,
+                    ownerAddress: game.owner,
                     name: game.general.name || "",
                     author: game.general.author || "",
                     renderer: game.connections.assetRenderer || "",
@@ -23,11 +22,11 @@ async function transfer() {
                     itemFilter: (game.connections.dnaFilters && game.connections.dnaFilters.itemFilter) || "",
                     gemFilter: (game.connections.dnaFilters && game.connections.dnaFilters.gemFilter) || "",
                     website: game.connections.webpage || "",
-                    status: 1,
+                    status: 2,
                 };
                 const {maxFeePerGas, maxPriorityFeePerGas} = await provider.getFeeData();
-                const gasLimit = await contract.estimateGas.create(gameRecord);
-                const tx = await contract.create(gameRecord, {
+                const gasLimit = await contract.estimateGas.create(wallet.address, gameRecord);
+                const tx = await contract.create(wallet.address, gameRecord, {
                     gasLimit,
                     maxFeePerGas,
                     maxPriorityFeePerGas,

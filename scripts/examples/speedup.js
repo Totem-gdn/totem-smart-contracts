@@ -4,11 +4,11 @@ const {ethers} = require("hardhat");
 const {hexDataSlice} = require("ethers/lib/utils");
 
 async function run() {
-    const {CONTRACT_ADDRESS, CONTRACT_NAME, API_URL, PRIVATE_KEY, TO} = process.env;
-    console.log(`Loading contract: ${process.env.CONTRACT_NAME} on address: ${CONTRACT_ADDRESS}`);
+    const {CONTRACT_ADDRESS, CONTRACT_FACTORY, API_URL, PRIVATE_KEY, TO} = process.env;
+    console.log(`Loading contract: ${process.env.CONTRACT_FACTORY} on address: ${CONTRACT_ADDRESS}`);
     const provider = new ethers.providers.JsonRpcProvider(API_URL);
     const account = new ethers.Wallet(PRIVATE_KEY, provider);
-    const contract = await ethers.getContractAt(CONTRACT_NAME, CONTRACT_ADDRESS, account);
+    const contract = await ethers.getContractAt(CONTRACT_FACTORY, CONTRACT_ADDRESS, account);
     const tx = await ethers.provider.getTransaction(
         "0xae0dcc1c9dab8b5d0042f2446a8cc4e546fbb7f9a00bb988df558a1d5d4d7709"
     );
