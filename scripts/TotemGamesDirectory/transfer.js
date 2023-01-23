@@ -1,11 +1,26 @@
 require("dotenv").config();
+const {writeFileSync} = require("node:fs");
 const hre = require("hardhat");
 
 async function transfer() {
     const provider = await hre.ethers.provider;
     const signer = await hre.ethers.getSigner(process.env.PUBLIC_KEY);
     const contract = await hre.ethers.getContractAt(process.env.CONTRACT_FACTORY, process.env.CONTRACT_ADDRESS, signer);
-    const games = await fetch(process.env.EXPLORER_API).then((res) => res.json());
+    const explorerUrl = new URL(process.env.EXPLORER_API);
+    explorerUrl.searchParams.set("list", "latest");
+    let games = [];
+    let found = 0;
+    let page = 1;
+    do {
+        explorerUrl.searchParams.set("page", page.toString(10));
+        found = 0;
+        const res = await fetch(explorerUrl.toString()).then((res) => res.json());
+        games.push(...res);
+        found = res.length;
+        page++;
+    } while (found !== 0);
+    console.log(`games count: ${games.length}`);
+    const json = [];
     for (const game of games) {
         console.group(game.general.name);
         const wallet = hre.ethers.Wallet.createRandom();
@@ -33,6 +48,12 @@ async function transfer() {
                 });
                 await tx.wait();
                 console.log(`tx hash: ${tx.hash}`);
+                json.push({
+                    name: game.general.name,
+                    mnemonic: wallet.mnemonic.phrase,
+                    privateKey: wallet.privateKey,
+                    address: wallet.address,
+                });
                 break;
             } catch (ex) {
                 console.error(`${ex.message}`);
@@ -40,6 +61,7 @@ async function transfer() {
         }
         console.groupEnd();
     }
+    writeFileSync("games.txt", JSON.stringify(json, null, "\t"), {encoding: "utf-8"});
 }
 
 transfer()

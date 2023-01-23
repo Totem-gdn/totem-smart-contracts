@@ -59,3 +59,21 @@ Game Legacy Contract
 
 Games Directory Contract  
 [0x56c07105cA580F6F3D4B0e2c2033CF3E9Cb215c8](https://mumbai.polygonscan.com/address/0x56c07105cA580F6F3D4B0e2c2033CF3E9Cb215c8)
+
+
+## Production contracts
+
+Avatar Legacy Contract  
+[0x76bc452b3f20F356C1FCdF61f2144E05CD90584d](https://mumbai.polygonscan.com/address/0x76bc452b3f20F356C1FCdF61f2144E05CD90584d)
+
+Item Legacy Contract  
+[0xdDa0ceF69A8b7894523B823bdEBB9fcBe86fF7c0](https://mumbai.polygonscan.com/address/0xdDa0ceF69A8b7894523B823bdEBB9fcBe86fF7c0)
+
+Gem Legacy Contract  
+[0xb1255917C82A71e49DF1f36E22C16A92eE429B82](https://mumbai.polygonscan.com/address/0xb1255917C82A71e49DF1f36E22C16A92eE429B82)
+
+Game Legacy Contract  
+[0x92dCDE5012405daCFa9332E0d75C07B62826A708](https://mumbai.polygonscan.com/address/0x92dCDE5012405daCFa9332E0d75C07B62826A708)
+
+Games Directory Contract  
+[0xF0Be39F816638Bd96e42a4219201dCfE18a33eef](https://mumbai.polygonscan.com/address/0xF0Be39F816638Bd96e42a4219201dCfE18a33eef)
