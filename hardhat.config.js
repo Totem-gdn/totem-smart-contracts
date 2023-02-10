@@ -5,7 +5,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("hardhat-abi-exporter");
 require("hardhat-gas-reporter");
 module.exports = {
-    solidity: "0.8.9",
+    solidity: "0.8.17",
     defaultNetwork: "hardhat",
     etherscan: {
         apiKey: {

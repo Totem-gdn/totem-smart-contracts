@@ -28,7 +28,7 @@ describe("Totem game legacy contract", function () {
         expect(await totemGameLegacies.balanceOf(gameAddress)).to.equal(BigNumber.from("0"));
         expect(await totemGameLegacies.balanceOf(emptyGameAddress)).to.equal(BigNumber.from("0"));
 
-        await expect(await totemGameLegacies.create(gameAddress, gameData))
+        await expect(totemGameLegacies.create(gameAddress, gameData))
             .to.emit(totemGameLegacies, "GameLegacyRecord")
             .withArgs(gameAddress, recordId);
 
@@ -44,7 +44,7 @@ describe("Totem game legacy contract", function () {
         expect(await totemGameLegacies.totalSupply()).to.equal(BigNumber.from("1"));
         expect(await totemGameLegacies.balanceOf(gameAddress)).to.equal(BigNumber.from("1"));
 
-        await expect(await totemGameLegacies.create(gameAddress, gameData))
+        await expect(totemGameLegacies.create(gameAddress, gameData))
             .to.emit(totemGameLegacies, "GameLegacyRecord")
             .withArgs(gameAddress, recordId);
 

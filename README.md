@@ -45,6 +45,15 @@ npx hardhat verify CONTRACT_ADDRESS --network mumbai
 
 ## Development contracts
 
+Totem Avatar Contract   
+[0x45C379E437bBC393cccA76Bacc41dCC04fe83D27](https://mumbai.polygonscan.com/address/0x45C379E437bBC393cccA76Bacc41dCC04fe83D27)
+
+Totem Item Contract   
+[0x68FcC37845D0085493375461fB0eB0c0039c725D](https://mumbai.polygonscan.com/address/0x68FcC37845D0085493375461fB0eB0c0039c725D)
+
+Totem Gem Contract   
+[0xE1FbBF5Ff7e50522855119712e4805aE0259D36E](https://mumbai.polygonscan.com/address/0xE1FbBF5Ff7e50522855119712e4805aE0259D36E)
+
 Avatar Legacy Contract  
 [0xc59693685E51b8C7b50be2F9446660d604109acF](https://mumbai.polygonscan.com/address/0xc59693685E51b8C7b50be2F9446660d604109acF)
 
