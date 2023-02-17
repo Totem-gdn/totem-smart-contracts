@@ -5,5 +5,6 @@ artifacts
 cache
 deployments
 node_modules
+experimental
 .env*
 !.env.sample

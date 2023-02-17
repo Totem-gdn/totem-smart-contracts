@@ -21,13 +21,9 @@ contract TotemAsset is
     ERC721Burnable,
     TotemPauser
 {
-    using Counters for Counters.Counter;
-
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant TOKEN_URI_ROLE = keccak256("TOKEN_URI_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
-
-    Counters.Counter private _tokenIdCounter;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -46,8 +42,7 @@ contract TotemAsset is
     }
 
     function _safeMint(address to, string memory uri, bytes memory data) internal {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        uint256 tokenId = totalSupply();
         super._safeMint(to, tokenId, data);
         _setTokenURI(tokenId, uri);
     }

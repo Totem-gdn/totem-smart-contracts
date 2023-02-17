@@ -72,6 +72,15 @@ Games Directory Contract
 
 ## Production contracts
 
+Totem Avatar Contract   
+[0x11dBDbF2e6D262c2fe7e73ace1A60c6862dC14dE](https://mumbai.polygonscan.com/address/0x11dBDbF2e6D262c2fe7e73ace1A60c6862dC14dE)
+
+Totem Item Contract   
+[0xEc9C96eF9b90a950057EDbe40B42385f3b1cE78C](https://mumbai.polygonscan.com/address/0xEc9C96eF9b90a950057EDbe40B42385f3b1cE78C)
+
+Totem Gem Contract   
+[0x981AE243e701bDbA0f6be830921c4F662ba90cE4](https://mumbai.polygonscan.com/address/0x981AE243e701bDbA0f6be830921c4F662ba90cE4)
+
 Avatar Legacy Contract  
 [0x76bc452b3f20F356C1FCdF61f2144E05CD90584d](https://mumbai.polygonscan.com/address/0x76bc452b3f20F356C1FCdF61f2144E05CD90584d)
 
