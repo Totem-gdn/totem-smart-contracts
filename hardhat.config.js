@@ -15,7 +15,7 @@ module.exports = {
     networks: {
         hardhat: {},
         mumbai: {
-            url: "https://matic-mumbai.chainstacklabs.com",
+            url: process.env.PROVIDER_URL,
             accounts: [process.env.PRIVATE_KEY],
         },
     },

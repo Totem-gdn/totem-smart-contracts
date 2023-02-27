@@ -30,11 +30,11 @@ npx hardhat run scripts/deploy.js --network mumbai
 ```
 
 After contract deployment you can find all deployment info in directory:  
-`deployments/{date}/{network}/{contract_factory}/{contract_args[1]}_{contract_address}`  
+`deployments/{contract_factory}/{network}/{date_in_ms}_{contract_args[1]}_{contract_address}`  
 Example:
 
 ```
-deployments/Thu-Jan-01-1970/mumbai/TotemGamesDirectory/[TEST]TotemGamesDirectory_0x0
+deployments/TotemGamesDirectory/mumbai/0000000000000_[TEST]TotemGamesDirectory_0xContractAddress
 ```
 
 ## Verify contract on etherscan

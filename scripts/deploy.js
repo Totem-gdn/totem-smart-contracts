@@ -37,15 +37,9 @@ async function deploy() {
         console.dir(contract);
         console.dir(txReceipt);
     }
-    const filepath = join(
-        process.cwd(),
-        "deployments",
-        new Date().toDateString().replace(/\s/g, "-"),
-        hre.network.name,
-        process.env.CONTRACT_FACTORY
-    );
+    const filepath = join(process.cwd(), "deployments", process.env.CONTRACT_FACTORY, hre.network.name);
     await mkdir(filepath, {recursive: true});
-    const fd = await open(join(filepath, `${args[1]}_${contract.address}`), "w+");
+    const fd = await open(join(filepath, `${Date.now()}_${args[1]}_${contract.address}`), "w+");
     const ws = fd.createWriteStream({encoding: "utf-8"});
     ws.write(
         JSON.stringify(
@@ -66,7 +60,7 @@ async function deploy() {
         )
     );
     ws.close();
-    fd.close();
+    await fd.close();
 }
 
 deploy().catch((err) => {
